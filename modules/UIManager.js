@@ -66,7 +66,7 @@ export default class UIManager {
     container.innerHTML = ''; // Clear previous settings
 
     if (!preset || !preset.settings) {
-      container.innerHTML = '<p class="text-muted">No settings for this preset.</p>';
+      container.innerHTML = '<p class="text-muted"><i class="fas fa-info-circle me-2"></i>No settings for this preset.</p>';
       return;
     }
 
@@ -75,13 +75,34 @@ export default class UIManager {
       if (!setting.label) continue; // Skip settings without labels
 
       const div = document.createElement('div');
-      div.className = 'mb-3';
+      div.className = 'control-item mb-3';
 
-      const label = document.createElement('label');
-      label.htmlFor = `preset-${key}`;
-      label.className = 'form-label d-flex justify-content-between';
-      label.innerHTML = `${setting.label}: <span id="preset-${key}-value">${setting.value}</span>`;
+      // Choose an appropriate icon based on setting key
+      const icon = this.getSettingIcon(key);
 
+      // Create the control header with label and value
+      const controlHeader = document.createElement('div');
+      controlHeader.className = 'control-header d-flex justify-content-between';
+      
+      // Label with icon
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'control-label';
+      labelDiv.innerHTML = `<i class="${icon} me-2"></i><span>${setting.label}</span>`;
+      
+      // Value display
+      const valueDiv = document.createElement('div');
+      valueDiv.className = 'control-value';
+      valueDiv.id = `preset-${key}-value`;
+      valueDiv.textContent = setting.value.toString();
+      
+      controlHeader.appendChild(labelDiv);
+      controlHeader.appendChild(valueDiv);
+
+      // Create the input control container
+      const inputDiv = document.createElement('div');
+      inputDiv.className = 'control-input';
+
+      // Create the range input
       const input = document.createElement('input');
       input.type = 'range';
       input.className = 'form-range';
@@ -91,13 +112,11 @@ export default class UIManager {
       input.step = setting.step;
       input.value = setting.value;
 
-      const valueSpan = label.querySelector('span');
-
       input.addEventListener('input', (e) => {
         const newValue = parseFloat(e.target.value);
         // Update the preset's setting value directly
         setting.value = newValue;
-        valueSpan.textContent = newValue.toFixed(setting.step.toString().includes('.') ? setting.step.toString().split('.')[1].length : 0); // Format based on step
+        valueDiv.textContent = newValue.toFixed(setting.step.toString().includes('.') ? setting.step.toString().split('.')[1].length : 0); // Format based on step
         
         // Optional: Trigger a simulator update if needed immediately
         if (this.simulator.currentPreset && typeof this.simulator.currentPreset.onSettingChange === 'function') {
@@ -105,10 +124,32 @@ export default class UIManager {
         }
       });
 
-      div.appendChild(label);
-      div.appendChild(input);
+      inputDiv.appendChild(input);
+      div.appendChild(controlHeader);
+      div.appendChild(inputDiv);
       container.appendChild(div);
     }
+  }
+
+  // Helper function to get appropriate icon for a setting
+  getSettingIcon(settingKey) {
+    const key = settingKey.toLowerCase();
+    
+    if (key.includes('speed') || key.includes('velocity')) {
+      return 'fas fa-tachometer-alt';
+    } else if (key.includes('rotation')) {
+      return 'fas fa-sync-alt';
+    } else if (key.includes('radius') || key.includes('size')) {
+      return 'fas fa-expand';
+    } else if (key.includes('segment')) {
+      return 'fas fa-grip-lines';
+    } else if (key.includes('hole')) {
+      return 'fas fa-circle-notch';
+    } else if (key.includes('thickness')) {
+      return 'fas fa-ruler-vertical';
+    }
+    
+    return 'fas fa-sliders-h';
   }
   
   // Load available presets into UI
@@ -117,8 +158,22 @@ export default class UIManager {
     
     presets.forEach((preset, index) => {
       const item = document.createElement('button');
-      item.className = 'list-group-item list-group-item-action';
-      item.textContent = preset.name;
+      item.className = 'list-group-item list-group-item-action d-flex align-items-center border-0';
+      
+      // Add icon based on preset type or use a default one
+      const icon = this.getPresetIcon(preset.name);
+      
+      // Create icon element
+      const iconEl = document.createElement('i');
+      iconEl.className = `${icon} me-3`;
+      
+      // Add the icon and name to the button
+      item.appendChild(iconEl);
+      
+      // Add preset name in a span
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = preset.name;
+      item.appendChild(nameSpan);
       
       if (preset.description) {
         item.title = preset.description;
@@ -146,6 +201,26 @@ export default class UIManager {
         item.click();
       }
     });
+  }
+  
+  // Helper function to get an appropriate icon based on preset name
+  getPresetIcon(presetName) {
+    const name = presetName.toLowerCase();
+    
+    if (name.includes('ring') || name.includes('circle') || name.includes('orbit')) {
+      return 'fas fa-circle-notch';
+    } else if (name.includes('ball') || name.includes('bounce')) {
+      return 'fas fa-basketball-ball';
+    } else if (name.includes('gravity') || name.includes('planet')) {
+      return 'fas fa-globe';
+    } else if (name.includes('pendulum') || name.includes('swing')) {
+      return 'fas fa-sync-alt';
+    } else if (name.includes('split') || name.includes('divide')) {
+      return 'fas fa-object-ungroup';
+    }
+    
+    // Default icon
+    return 'fas fa-atom';
   }
   
   // Initialize event listeners for controls

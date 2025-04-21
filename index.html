@@ -12,16 +12,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid px-4 py-3">
+        <div class="row gx-4">
             <!-- Presets Panel -->
             <div class="col-md-2 preset-panel">
                 <div class="card">
-                    <div class="card-header">
-                        <h5>Presets</h5>
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-book"></i> Presets</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="list-group" id="presetsList">
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="presetsList">
                             <!-- Presets will be loaded here dynamically -->
                         </div>
                     </div>
@@ -29,89 +29,140 @@
             </div>
             
             <!-- Simulation Area -->
-            <div class="col-md-7 simulation-container">
-                <div class="card mb-4">
-                    <div class="card-body p-0">
-                        <canvas id="simulationCanvas"></canvas>
+            <div class="col-md-6 simulation-container">
+                <!-- Playback Controls - Moved Above Canvas -->
+                <div class="compact-controls mb-2">
+                    <div class="d-flex justify-content-center gap-3">
+                        <button id="startBtn" class="btn btn-sm btn-success">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button id="pauseBtn" class="btn btn-sm btn-warning" disabled>
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button id="resetBtn" class="btn btn-sm btn-danger">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
                     </div>
                 </div>
                 
-                <!-- Playback Controls -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center gap-3">
-                            <button id="startBtn" class="btn btn-success">
-                                <i class="fas fa-play"></i> Start
-                            </button>
-                            <button id="pauseBtn" class="btn btn-warning" disabled>
-                                <i class="fas fa-pause"></i> Pause
-                            </button>
-                            <button id="resetBtn" class="btn btn-danger">
-                                <i class="fas fa-redo"></i> Reset
-                            </button>
+                <div class="card simulation-card">
+                    <div class="card-body p-0">
+                        <div class="aspect-ratio-container">
+                            <canvas id="simulationCanvas"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
             
             <!-- Control Panel -->
-            <div class="col-md-3 control-panel">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Control Panel</h5>
+            <div class="col-md-4 control-panel">
+                <div class="control-header bg-primary text-white p-3 mb-3 rounded-top">
+                    <h5><i class="fas fa-sliders-h"></i> Control Panel</h5>
+                </div>
+                
+                <!-- Statistics Section -->
+                <div class="control-section mb-4">
+                    <div class="section-header mb-3">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        <span>Statistics</span>
                     </div>
-                    <div class="card-body">
-                        <div class="stats mb-4">
-                            <h6>Statistics</h6>
-                            <div class="row">
-                                <div class="col-6">Balls count:</div>
-                                <div class="col-6" id="ballsCount">0</div>
+                    <div class="section-content">
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <i class="fas fa-basketball-ball me-2"></i>
+                                <span>Balls count:</span>
                             </div>
-                            <div class="row">
-                                <div class="col-6">Simulation time:</div>
-                                <div class="col-6"><span id="simulationTime">0</span>s</div>
+                            <div class="stat-value" id="ballsCount">0</div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>Simulation time:</span>
                             </div>
-                            <div class="row">
-                                <div class="col-6">FPS:</div>
-                                <div class="col-6" id="fpsCounter">0</div>
+                            <div class="stat-value">
+                                <span id="simulationTime">0</span>s
+                            </div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                <span>FPS:</span>
+                            </div>
+                            <div class="stat-value" id="fpsCounter">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Global Controls Section -->
+                <div class="control-section mb-4">
+                    <div class="section-header mb-3">
+                        <i class="fas fa-cogs me-2"></i>
+                        <span>Global Controls</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="control-item mb-3">
+                            <div class="control-header d-flex justify-content-between">
+                                <div class="control-label">
+                                    <i class="fas fa-arrow-down me-2"></i>
+                                    <span>Gravity</span>
+                                </div>
+                                <div class="control-value" id="gravityValue">0.2</div>
+                            </div>
+                            <div class="control-input">
+                                <input type="range" class="form-range" id="gravityControl" min="0" max="1" step="0.01" value="0.2">
                             </div>
                         </div>
                         
-                        <div class="physics-controls mb-4">
-                            <h6>Global Controls</h6>
-                            <div class="mb-3">
-                                <label for="gravityControl" class="form-label d-flex justify-content-between">
-                                    Gravity: <span id="gravityValue">0.2</span>
-                                </label>
-                                <input type="range" class="form-range" id="gravityControl" min="0" max="1" step="0.01" value="0.2">
+                        <div class="control-item mb-3">
+                            <div class="control-header d-flex justify-content-between">
+                                <div class="control-label">
+                                    <i class="fas fa-fast-forward me-2"></i>
+                                    <span>Simulation Speed</span>
+                                </div>
+                                <div class="control-value"><span id="timeScaleValue">1.0</span>x</div>
                             </div>
-                            <div class="mb-3">
-                                <label for="timeScaleControl" class="form-label d-flex justify-content-between">
-                                    Simulation Speed: <span id="timeScaleValue">1.0</span>x
-                                </label>
+                            <div class="control-input">
                                 <input type="range" class="form-range" id="timeScaleControl" min="0.1" max="3" step="0.1" value="1.0">
                             </div>
-                            <div class="mb-3">
-                                <label for="maxBallsControl" class="form-label d-flex justify-content-between">
-                                    Max Balls: <span id="maxBallsValue">100</span>
-                                </label>
+                        </div>
+                        
+                        <div class="control-item mb-3">
+                            <div class="control-header d-flex justify-content-between">
+                                <div class="control-label">
+                                    <i class="fas fa-layer-group me-2"></i>
+                                    <span>Max Balls</span>
+                                </div>
+                                <div class="control-value" id="maxBallsValue">100</div>
+                            </div>
+                            <div class="control-input">
                                 <input type="range" class="form-range" id="maxBallsControl" min="10" max="500" step="10" value="100">
                             </div>
-                            <div class="mb-3">
-                                <label for="bouncinessControl" class="form-label d-flex justify-content-between">
-                                    Bounciness: <span id="bouncinessValue">0.7</span>
-                                </label>
+                        </div>
+                        
+                        <div class="control-item mb-3">
+                            <div class="control-header d-flex justify-content-between">
+                                <div class="control-label">
+                                    <i class="fas fa-retweet me-2"></i>
+                                    <span>Bounciness</span>
+                                </div>
+                                <div class="control-value" id="bouncinessValue">0.7</div>
+                            </div>
+                            <div class="control-input">
                                 <input type="range" class="form-range" id="bouncinessControl" min="0.1" max="1.5" step="0.05" value="0.7">
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="preset-specific-controls mb-4">
-                            <h6>Preset Settings</h6>
-                            <div id="presetSettingsContainer">
-                                <!-- Preset settings will be loaded here -->
-                                <p class="text-muted">Select a preset to see its settings.</p>
-                            </div>
-                        </div>
+                <!-- Preset Settings Section -->
+                <div class="control-section mb-4">
+                    <div class="section-header mb-3">
+                        <i class="fas fa-wrench me-2"></i>
+                        <span>Preset Settings</span>
+                    </div>
+                    <div class="section-content" id="presetSettingsContainer">
+                        <!-- Preset settings will be loaded here -->
+                        <p class="text-muted">Select a preset to see its settings.</p>
                     </div>
                 </div>
             </div>
